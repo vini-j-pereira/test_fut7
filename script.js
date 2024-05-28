@@ -29,6 +29,7 @@ function adicionarLinhaNaTabela(player) {
         <td>
             <button class="btn-remove" onclick="removerLinha(this)">Remover</button>
         </td>
+
     `;
 
     tableBody.appendChild(row);

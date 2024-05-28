@@ -12,6 +12,7 @@
 </head>
 <body>
     <nav>
+        <img src="img/Fotbot7 (4).png" alt="">
         <ul>
             <li>
                 <a href="index.html">Home</a>
@@ -21,13 +22,17 @@
             </li>
         </ul>
     </nav>
-    <h2>Ranking de Saldo de Gols</h2>
-    <table>
+
+    <section>
+
+        <div class="container">
+                <h2>Ranking de Saldo de Gols</h2>
+    <table class="rk-gols">
         <thead>
             <tr>
                 <th>Posição</th>
-                <th>Número da Camisa</th>
-                <th>Nome do Jogador</th>
+                <th>Camisa</th>
+                <th>Jogador</th>
                 <th>Gols</th>
             </tr>
         </thead>
@@ -35,21 +40,29 @@
             <!-- Dados dos jogadores por saldo de gols serão inseridos aqui -->
         </tbody>
     </table>
+        </div>
 
-    <h2>Ranking de Saldo de Assistências</h2>
-    <table>
+        <div class="container">
+            <h2>Ranking de Saldo de Assistências</h2>
+    <table class="rk-assist">
         <thead>
             <tr>
                 <th>Posição</th>
-                <th>Número da Camisa</th>
-                <th>Nome do Jogador</th>
+                <th>Camisa</th>
+                <th>Jogador</th>
                 <th>Assistências</th>
             </tr>
         </thead>
         <tbody id="assists-ranking-body">
             <!-- Dados dos jogadores por saldo de assistências serão inseridos aqui -->
         </tbody>
+        </div>
+    
+
+    
     </table>
+    </section>
+    
 
     <script src="ranking.js"></script>
 </body>
