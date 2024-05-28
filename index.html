@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>Jogadores de Futebol</title>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li>
+                <a href="index.html">Home</a>
+            </li>
+            <li>
+                <a href="ranking.html">Ranking</a>
+            </li>
+        </ul>
+    </nav>
+     <form id="player-form">
+        <input type="number" id="number" placeholder="Número da Camisa" required>
+        <input type="text" id="name" placeholder="Nome do Jogador" required>
+        <button type="submit">Adicionar Jogador</button>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <th>Número da Camisa</th>
+                <th>Nome do Jogador</th>
+                <th>Gols</th>
+                <th>Ações de Gols</th>
+                <th>Assistências</th>
+                <th>Ações de Assistências</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="player-table-body">
+            <!-- Os dados dos jogadores serão inseridos aqui -->
+        </tbody>
+    </table>
+
+   
+
+    <script src="script.js"></script>
+</body>
+</html>
