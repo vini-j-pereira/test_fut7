@@ -49,7 +49,7 @@ document.getElementById('player-form').addEventListener('submit', function(event
     };
 
     adicionarLinhaNaTabela(player);
-
+    
     // Opcional: Enviar os dados para o servidor para persistência
     fetch('http://localhost:3000/players', {
         method: 'POST',
