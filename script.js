@@ -1,12 +1,18 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const response = await fetch('http://localhost:3000/players');
-    const players = await response.json();
+    try {
+        const response = await fetch('http://localhost:3000/players');
+        if (!response.ok) throw new Error('Network response was not ok');
+        const players = await response.json();
 
-    const tableBody = document.getElementById('player-table-body');
+        const tableBody = document.getElementById('player-table-body');
+        tableBody.innerHTML = ''; // Limpa a tabela antes de adicionar os dados
 
-    players.forEach(player => {
-        adicionarLinhaNaTabela(player);
-    });
+        players.forEach(player => {
+            adicionarLinhaNaTabela(player);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar jogadores:', error);
+    }
 });
 
 function adicionarLinhaNaTabela(player) {
@@ -16,26 +22,25 @@ function adicionarLinhaNaTabela(player) {
     row.innerHTML = `
         <td>${player.number}</td>
         <td>${player.name}</td>
-        <td id="goals-${player.number}">${player.goals}</td>
+        <td id="goals-${player._id}">${player.goals}</td>
         <td>
-            <button onclick="adicionarGol(${player.number})">+</button>
-            <button onclick="removerGol(${player.number})">-</button>
+            <button onclick="adicionarGol('${player._id}')">+</button>
+            <button onclick="removerGol('${player._id}')">-</button>
         </td>
-        <td id="assists-${player.number}">${player.assists}</td>
+        <td id="assists-${player._id}">${player.assists}</td>
         <td>
-            <button onclick="adicionarAssistencia(${player.number})">+</button>
-            <button onclick="removerAssistencia(${player.number})">-</button>
+            <button onclick="adicionarAssistencia('${player._id}')">+</button>
+            <button onclick="removerAssistencia('${player._id}')">-</button>
         </td>
         <td>
-            <button class="btn-remove" onclick="removerLinha(this)">Remover</button>
+            <button class="btn-remove" onclick="removerLinha('${player._id}', this)">Remover</button>
         </td>
-
     `;
 
     tableBody.appendChild(row);
 }
 
-document.getElementById('player-form').addEventListener('submit', function(event) {
+document.getElementById('player-form').addEventListener('submit', async function(event) {
     event.preventDefault();
 
     const number = document.getElementById('number').value;
@@ -48,88 +53,86 @@ document.getElementById('player-form').addEventListener('submit', function(event
         assists: 0
     };
 
-    adicionarLinhaNaTabela(player);
-    
-    // Opcional: Enviar os dados para o servidor para persistência
-    fetch('http://localhost:3000/players', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(player)
-    }).then(response => response.json()).then(data => {
-        console.log('Jogador adicionado:', data);
-    }).catch(error => {
-        console.error('Erro ao adicionar jogador:', error);
-    });
+    try {
+        const response = await fetch('http://localhost:3000/players', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(player)
+        });
 
-    // Limpar os campos do formulário
-    document.getElementById('number').value = '';
-    document.getElementById('name').value = '';
+        if (!response.ok) throw new Error('Network response was not ok');
+        const newPlayer = await response.json();
+        adicionarLinhaNaTabela(newPlayer);
+
+        // Limpar os campos do formulário
+        document.getElementById('number').value = '';
+        document.getElementById('name').value = '';
+    } catch (error) {
+        console.error('Erro ao adicionar jogador:', error);
+    }
 });
 
-function removerLinha(button) {
-    const row = button.parentNode.parentNode;
-    const number = row.cells[0].textContent;
+async function removerLinha(id, button) {
+    try {
+        const response = await fetch(`http://localhost:3000/players/${id}`, {
+            method: 'DELETE'
+        });
 
-    row.parentNode.removeChild(row);
-
-    // Opcional: Remover os dados do servidor
-    fetch(`http://localhost:3000/players/${number}`, {
-        method: 'DELETE'
-    }).then(response => response.json()).then(data => {
-        console.log('Jogador removido:', data);
-    }).catch(error => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        button.closest('tr').remove();
+    } catch (error) {
         console.error('Erro ao remover jogador:', error);
-    });
-}
-
-function adicionarGol(number) {
-    const goalsCell = document.getElementById(`goals-${number}`);
-    goalsCell.textContent = parseInt(goalsCell.textContent) + 1;
-
-    // Opcional: Atualizar os dados no servidor
-    atualizarEstatistica(number, 'goals', parseInt(goalsCell.textContent));
-}
-
-function removerGol(number) {
-    const goalsCell = document.getElementById(`goals-${number}`);
-    if (parseInt(goalsCell.textContent) > 0) {
-        goalsCell.textContent = parseInt(goalsCell.textContent) - 1;
-
-        // Opcional: Atualizar os dados no servidor
-        atualizarEstatistica(number, 'goals', parseInt(goalsCell.textContent));
     }
 }
 
-function adicionarAssistencia(number) {
-    const assistsCell = document.getElementById(`assists-${number}`);
-    assistsCell.textContent = parseInt(assistsCell.textContent) + 1;
+async function atualizarEstatistica(id, field, value) {
+    try {
+        const response = await fetch(`http://localhost:3000/players/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ [field]: value })
+        });
 
-    // Opcional: Atualizar os dados no servidor
-    atualizarEstatistica(number, 'assists', parseInt(assistsCell.textContent));
-}
-
-function removerAssistencia(number) {
-    const assistsCell = document.getElementById(`assists-${number}`);
-    if (parseInt(assistsCell.textContent) > 0) {
-        assistsCell.textContent = parseInt(assistsCell.textContent) - 1;
-
-        // Opcional: Atualizar os dados no servidor
-        atualizarEstatistica(number, 'assists', parseInt(assistsCell.textContent));
-    }
-}
-
-function atualizarEstatistica(number, field, value) {
-    fetch(`http://localhost:3000/players/${number}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ [field]: value })
-    }).then(response => response.json()).then(data => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
         console.log('Estatística atualizada:', data);
-    }).catch(error => {
+    } catch (error) {
         console.error('Erro ao atualizar estatística:', error);
-    });
+    }
+}
+
+function adicionarGol(id) {
+    const goalsCell = document.getElementById(`goals-${id}`);
+    const newValue = parseInt(goalsCell.textContent) + 1;
+    goalsCell.textContent = newValue;
+    atualizarEstatistica(id, 'goals', newValue);
+}
+
+function removerGol(id) {
+    const goalsCell = document.getElementById(`goals-${id}`);
+    if (parseInt(goalsCell.textContent) > 0) {
+        const newValue = parseInt(goalsCell.textContent) - 1;
+        goalsCell.textContent = newValue;
+        atualizarEstatistica(id, 'goals', newValue);
+    }
+}
+
+function adicionarAssistencia(id) {
+    const assistsCell = document.getElementById(`assists-${id}`);
+    const newValue = parseInt(assistsCell.textContent) + 1;
+    assistsCell.textContent = newValue;
+    atualizarEstatistica(id, 'assists', newValue);
+}
+
+function removerAssistencia(id) {
+    const assistsCell = document.getElementById(`assists-${id}`);
+    if (parseInt(assistsCell.textContent) > 0) {
+        const newValue = parseInt(assistsCell.textContent) - 1;
+        assistsCell.textContent = newValue;
+        atualizarEstatistica(id, 'assists', newValue);
+    }
 }

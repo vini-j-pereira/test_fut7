@@ -19,7 +19,18 @@ app.get("/", async (req, res) => {
 })
 
 app.delete("/:id", async (req, res) => {
-    const player = await Player.findById(req.params.id);
+    const player = await Player.findByIdAndDelete(req.params.id);
+    return res.send(player);
+})
+
+app.put("/:id", async (req, res) => {
+    const player = await Player.findByIdAndUpdate(req.params.id, {
+        number: req.body.number,
+        name: req.body.name,
+        goals: req.body.goals,
+        assists: req.body.assists
+    })
+
     return res.send(player);
 })
 
